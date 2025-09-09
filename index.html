@@ -1,86 +1,71 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('userForm');
-    const nameInput = document.getElementById('name');
-    const emailInput = document.getElementById('email');
-    const ageInput = document.getElementById('age');
-    const nameError = document.getElementById('nameError');
-    const emailError = document.getElementById('emailError');
-    const ageError = document.getElementById('ageError');
-    const successMessage = document.getElementById('successMessage');
-    const successData = document.getElementById('successData');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body style="margin:0">
+    <canvas id="sketchPad" width="800" height="600"></canvas>
+    <div style="margin-top:610px">
+        <button id="redBtn">Red</button>
+        <button id="blueBtn">Blue</button>
+        <button id="eraserBtn">Eraser</button>
+        <button id="clearBtn">Clear</button>
+        <span id="currentColor"></span>
+    </div>
+    <script>
+        const c=document.getElementById("sketchPad"),
+        ctx=c.getContext("2d"),
+        cur=document.getElementById("currentColor"),
+        W=c.width,
+        H=c.height,
+        LIMIT=500;
+        let draw = false;
+        ctx.clearRect(0,0,W,H);
+        ctx.fillStyle="#fff";
+        ctx.fillRect(0,0,LIMIT,H);
 
-    // Hide all error messages initially
-    nameError.style.display = 'none';
-    emailError.style.display = 'none';
-    ageError.style.display = 'none';
-
-    // Validate name field
-    function validateName() {
-        if (nameInput.value.trim() === '') {
-            nameInput.classList.add('is-invalid');
-            nameError.style.display = 'block';
-            return false;
-        } else {
-            nameInput.classList.remove('is-invalid');
-            nameError.style.display = 'none';
-            return true;
+        function setColor(col,label){
+            ctx.strokeStyle=col;
+            ctx.fillStyle=col;
+            cur.textContent=label;
         }
-    }
-
-    // Validate email field
-    function validateEmail() {
-        const email = emailInput.value.trim();
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        
-        if (email === '' || !emailRegex.test(email) || !email.endsWith('.com')) {
-            emailInput.classList.add('is-invalid');
-            emailError.style.display = 'block';
-            return false;
-        } else {
-            emailInput.classList.remove('is-invalid');
-            emailError.style.display = 'none';
-            return true;
+        function pos(e){
+            const r = c.getBoundingClientRect();
+            return {x:e.clientX-r.left,y:e.clientY-r.top}
         }
-    }
+        c.onmousedown=e=>{
+            let p = pos(e);
+            if(p.x<0||p.y<0||p.x>=W||p.y>=H||p.x>=LIMIT) return;
+            draw=true;
+            ctx.beginPath();
+            ctx.moveTo(p.x,p.y);
+        };
+        c.onmousemove=e=>{
+            if(!draw) return;
+            let p = pos(e);
+            if(p.x<0||p.y<0||p.x>=W||p.y>=H||p.x>=LIMIT)
+            {
+                draw=false;
+                return;
+            }
+            ctx.lineTo(p.x,p.y);
+            ctx.stroke();
+        };
+        c.onmouseup =_=>draw=false;
 
-    // Validate age field
-    function validateAge() {
-        const age = parseInt(ageInput.value);
-        
-        if (isNaN(age) || age < 18 || age > 120) {
-            ageInput.classList.add('is-invalid');
-            ageError.style.display = 'block';
-            return false;
-        } else {
-            ageInput.classList.remove('is-invalid');
-            ageError.style.display = 'none';
-            return true;
+        redBtn.onclick =_=>setColor("#ff0000","Red");
+        blueBtn.onclick =_=>setColor("#0000ff","Blue");
+        eraserBtn.onclick =_=>setColor("#ffffff","Eraser");
+        clearBtn.onclick =_=>{
+            ctx.clearRect(0,0,W,H);
+            ctx.fillStyle="#fff";
+            ctx.fillRect(0,0,LIMIT,H);
+            setColor("#000","")
         }
-    }
+    </script>
+</body>
+</html>
 
-    // Form submission handler
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const isNameValid = validateName();
-        const isEmailValid = validateEmail();
-        const isAgeValid = validateAge();
-        
-        if (isNameValid && isEmailValid && isAgeValid) {
-            // All fields are valid, show success message
-            successData.textContent = Name: ${nameInput.value}, Email: ${emailInput.value}, Age: ${ageInput.value};
-            successMessage.classList.remove('d-none');
-            
-            // Reset form after successful submission
-            setTimeout(() => {
-                form.reset();
-                successMessage.classList.add('d-none');
-            }, 3000);
-        }
-    });
-
-    // Real-time validation on input change
-    nameInput.addEventListener('input', validateName);
-    emailInput.addEventListener('input', validateEmail);
-    ageInput.addEventListener('input', validateAge);
-});
+COY
