@@ -1,101 +1,86 @@
-PAH 2                                                                                                                                  <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Mini Text Editor</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 30px;
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('userForm');
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const ageInput = document.getElementById('age');
+    const nameError = document.getElementById('nameError');
+    const emailError = document.getElementById('emailError');
+    const ageError = document.getElementById('ageError');
+    const successMessage = document.getElementById('successMessage');
+    const successData = document.getElementById('successData');
+
+    // Hide all error messages initially
+    nameError.style.display = 'none';
+    emailError.style.display = 'none';
+    ageError.style.display = 'none';
+
+    // Validate name field
+    function validateName() {
+        if (nameInput.value.trim() === '') {
+            nameInput.classList.add('is-invalid');
+            nameError.style.display = 'block';
+            return false;
+        } else {
+            nameInput.classList.remove('is-invalid');
+            nameError.style.display = 'none';
+            return true;
+        }
     }
 
-    #toolbar {
-      margin-bottom: 15px;
+    // Validate email field
+    function validateEmail() {
+        const email = emailInput.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (email === '' || !emailRegex.test(email) || !email.endsWith('.com')) {
+            emailInput.classList.add('is-invalid');
+            emailError.style.display = 'block';
+            return false;
+        } else {
+            emailInput.classList.remove('is-invalid');
+            emailError.style.display = 'none';
+            return true;
+        }
     }
 
-    select, button {
-      margin-right: 10px;
-      padding: 5px 10px;
-      font-size: 14px;
+    // Validate age field
+    function validateAge() {
+        const age = parseInt(ageInput.value);
+        
+        if (isNaN(age) || age < 18 || age > 120) {
+            ageInput.classList.add('is-invalid');
+            ageError.style.display = 'block';
+            return false;
+        } else {
+            ageInput.classList.remove('is-invalid');
+            ageError.style.display = 'none';
+            return true;
+        }
     }
 
-    button.active {
-      background-color: #007bff;
-      color: white;
-    }
-
-    #editor {
-      border: 1px solid #ccc;
-      padding: 10px;
-      min-height: 150px;
-      font-size: 12px;
-      color: black;
-    }
-  </style>
-</head>
-<body>
-  <h2>Mini Text Editor</h2>
-
-  <div id="toolbar">
-    <label for="fontSizeSelect">Font Size: </label>
-    <select id="fontSizeSelect">
-      <option value="12px" selected>12px</option>
-      <option value="16px">16px</option>
-      <option value="20px">20px</option>
-    </select>
-
-    <label for="fontColorSelect">Font Color: </label>
-    <select id="fontColorSelect">
-      <option value="black" selected>Black</option>
-      <option value="red">Red</option>
-      <option value="blue">Blue</option>
-    </select>
-
-    <button id="boldBtn">Bold</button>
-    <button id="italicBtn">Italic</button>
-    <button id="resetBtn">Reset</button>
-  </div>
-
-  <div id="editor" contenteditable="true">
-    Type something here...
-  </div>
-
-  <script>
-    const editor = document.getElementById('editor');
-    const fontSizeSelect = document.getElementById('fontSizeSelect');
-    const fontColorSelect = document.getElementById('fontColorSelect');
-    const boldBtn = document.getElementById('boldBtn');
-    const italicBtn = document.getElementById('italicBtn');
-    const resetBtn = document.getElementById('resetBtn');
-
-    fontSizeSelect.addEventListener('change', () => {
-      editor.style.fontSize = fontSizeSelect.value;
+    // Form submission handler
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const isNameValid = validateName();
+        const isEmailValid = validateEmail();
+        const isAgeValid = validateAge();
+        
+        if (isNameValid && isEmailValid && isAgeValid) {
+            // All fields are valid, show success message
+            successData.textContent = Name: ${nameInput.value}, Email: ${emailInput.value}, Age: ${ageInput.value};
+            successMessage.classList.remove('d-none');
+            
+            // Reset form after successful submission
+            setTimeout(() => {
+                form.reset();
+                successMessage.classList.add('d-none');
+            }, 3000);
+        }
     });
 
-    fontColorSelect.addEventListener('change', () => {
-      editor.style.color = fontColorSelect.value;
-    });
-
-    boldBtn.addEventListener('click', () => {
-      boldBtn.classList.toggle('active');
-      editor.style.fontWeight = boldBtn.classList.contains('active') ? 'bold' : 'normal';
-    });
-
-    italicBtn.addEventListener('click', () => {
-      italicBtn.classList.toggle('active');
-      editor.style.fontStyle = italicBtn.classList.contains('active') ? 'italic' : 'normal';
-    });
-
-    resetBtn.addEventListener('click', () => {
-      fontSizeSelect.value = '12px';
-      fontColorSelect.value = 'black';
-      boldBtn.classList.remove('active');
-      italicBtn.classList.remove('active');
-      editor.style.fontSize = '12px';
-      editor.style.color = 'black';
-      editor.style.fontWeight = 'normal';
-      editor.style.fontStyle = 'normal';
-    });
-  </script>
-</body>
-</html>
+    // Real-time validation on input change
+    nameInput.addEventListener('input', validateName);
+    emailInput.addEventListener('input', validateEmail);
+    ageInput.addEventListener('input', validateAge);
+});
